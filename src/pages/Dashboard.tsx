@@ -100,17 +100,28 @@ export default function Dashboard() {
                   <p className="text-sm text-muted-foreground">All caught up! Parse a new assignment to get started.</p>
                 ) : (
                   <div className="space-y-2">
-                    {todayTasks.map(task => (
+                    {todayTasks.map(task => {
+                      const assignment = assignments.find(a => a.id === task.assignment_id);
+                      return (
                       <div key={task.id} className="flex items-center gap-3 p-3 rounded-lg bg-secondary/50">
-                        <div className={`h-2 w-2 rounded-full ${task.status === 'in_progress' ? 'bg-primary' : 'bg-muted-foreground/30'}`} />
-                        <span className="text-sm text-foreground flex-1">{task.title}</span>
+                        <div className={`h-2 w-2 shrink-0 rounded-full ${task.status === 'in_progress' ? 'bg-primary' : 'bg-muted-foreground/30'}`} />
+                        <div className="flex-1 min-w-0">
+                          <span className="text-sm font-medium text-foreground block truncate">{task.title}</span>
+                          {assignment && (
+                            <span className="text-xs text-muted-foreground block truncate mt-1">
+                              From <Link to={`/assignment/${assignment.id}`} className="hover:underline text-primary/80 font-medium">{assignment.title}</Link>
+                              {assignment.course_name && <span className="opacity-70"> • {assignment.course_name}</span>}
+                            </span>
+                          )}
+                        </div>
                         {task.estimated_minutes && (
-                          <span className="text-xs text-muted-foreground flex items-center gap-1">
+                          <span className="text-xs text-muted-foreground flex items-center gap-1 shrink-0">
                             <Clock className="h-3 w-3" /> {task.estimated_minutes}m
                           </span>
                         )}
                       </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 )}
               </div>
