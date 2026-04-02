@@ -41,7 +41,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       password,
       options: {
         data: { full_name: fullName, username },
-        emailRedirectTo: window.location.origin,
+        emailRedirectTo: 'https://assignflow.app',
       },
     });
     return { error: error as Error | null };
@@ -58,7 +58,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const resetPassword = async (email: string) => {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password`,
+      redirectTo: 'https://assignflow.app/reset-password',
     });
     return { error: error as Error | null };
   };
