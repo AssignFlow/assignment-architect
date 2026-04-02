@@ -30,10 +30,10 @@ export function parseAssignmentText(rawText: string, title: string, courseName: 
 
   // Estimate effort
   const wordCount = rawText.split(/\s+/).length;
-  let effortEstimate = '2-3 hours';
+  let effortEstimate = '1-2 hours';
   let difficultyEstimate = 'Medium';
-  if (wordCount > 300) { effortEstimate = '4-6 hours'; difficultyEstimate = 'Medium-High'; }
-  if (wordCount > 500) { effortEstimate = '6-10 hours'; difficultyEstimate = 'High'; }
+  if (wordCount > 300) { effortEstimate = '2-3 hours'; difficultyEstimate = 'Medium-High'; }
+  if (wordCount > 500) { effortEstimate = '3-5 hours'; difficultyEstimate = 'High'; }
 
   // Priority
   let priorityLevel: Assignment['priority_level'] = 'medium';
@@ -100,60 +100,55 @@ interface GeneratedTask {
 function generateTasks(type: Assignment['assignment_type'], title: string, dueDate: string | null): GeneratedTask[] {
   const baseTasks: Record<string, GeneratedTask[]> = {
     essay: [
-      { title: 'Read and analyze the prompt', description: 'Carefully read through the assignment prompt. Highlight key requirements and note any questions.', estimatedMinutes: 20, order: 0 },
-      { title: 'Research and gather sources', description: 'Find relevant sources, take notes, and identify key arguments or evidence.', estimatedMinutes: 60, order: 1 },
-      { title: 'Create an outline', description: 'Organize your main points into a logical structure with intro, body, and conclusion.', estimatedMinutes: 30, order: 2 },
-      { title: 'Write the first draft', description: 'Write the full essay following your outline. Don\'t worry about perfection yet.', estimatedMinutes: 90, order: 3 },
-      { title: 'Revise and edit', description: 'Review for clarity, argument strength, grammar, and formatting requirements.', estimatedMinutes: 45, order: 4 },
-      { title: 'Final review and submit', description: 'Do a final read-through, check formatting, and submit before the deadline.', estimatedMinutes: 20, order: 5 },
+      { title: 'Analyze prompt & rubric', description: 'Review the grading criteria, length requirements, and identify the core question to answer.', estimatedMinutes: 10, order: 0 },
+      { title: 'Gather sources & evidence', description: 'Locate required citations, book quotes, or academic sources to support your arguments.', estimatedMinutes: 30, order: 1 },
+      { title: 'Outline & thesis drafting', description: 'Formulate a strong thesis statement and plot out the core arguments for body paragraphs.', estimatedMinutes: 15, order: 2 },
+      { title: 'Rough draft writing', description: 'Focus purely on getting ideas down without over-analyzing grammar and flow.', estimatedMinutes: 60, order: 3 },
+      { title: 'Formatting & citations', description: 'Add proper APA/MLA formatting, bibliography, and align with margin/font rules.', estimatedMinutes: 15, order: 4 },
+      { title: 'Final polish & proofread', description: 'Read aloud to catch unnatural phrasing and correct grammatical errors.', estimatedMinutes: 15, order: 5 },
     ],
     lab_report: [
-      { title: 'Review lab procedures', description: 'Go through the lab manual and understand each step of the experiment.', estimatedMinutes: 20, order: 0 },
-      { title: 'Organize raw data', description: 'Compile and organize all data collected during the lab session.', estimatedMinutes: 30, order: 1 },
-      { title: 'Create tables and figures', description: 'Build data tables, graphs, and charts to visualize your results.', estimatedMinutes: 45, order: 2 },
-      { title: 'Write methods and results', description: 'Describe the experimental procedure and present your findings.', estimatedMinutes: 40, order: 3 },
-      { title: 'Write introduction and discussion', description: 'Provide context and interpret your results in the discussion section.', estimatedMinutes: 50, order: 4 },
-      { title: 'Write abstract and conclusion', description: 'Summarize the entire report and state your conclusions.', estimatedMinutes: 25, order: 5 },
-      { title: 'Review and format', description: 'Check formatting, citations, and proofread the entire report.', estimatedMinutes: 20, order: 6 },
+      { title: 'Review experiment goals', description: 'Understand the underlying hypothesis and theoretical background of the lab.', estimatedMinutes: 10, order: 0 },
+      { title: 'Format raw data', description: 'Clean up messy lab notes and identify the key metrics recorded.', estimatedMinutes: 15, order: 1 },
+      { title: 'Create charts/tables', description: 'Generate data visualizations ensuring proper axis labels and units.', estimatedMinutes: 20, order: 2 },
+      { title: 'Write Methods & Results', description: 'Document the exact procedure and present the factual outcomes neutrally.', estimatedMinutes: 25, order: 3 },
+      { title: 'Draft Discussion section', description: 'Interpret the results, calculate error margins, and explain anomalies.', estimatedMinutes: 30, order: 4 },
+      { title: 'Finalize Abstract & format', description: 'Write the brief summary last, and ensure scientific formatting is consistent.', estimatedMinutes: 15, order: 5 },
     ],
     programming: [
-      { title: 'Understand the requirements', description: 'Read through the assignment and identify inputs, outputs, and constraints.', estimatedMinutes: 20, order: 0 },
-      { title: 'Plan the solution', description: 'Sketch out your approach, data structures, and algorithms before coding.', estimatedMinutes: 30, order: 1 },
-      { title: 'Set up the project', description: 'Create the project structure, files, and any boilerplate code.', estimatedMinutes: 15, order: 2 },
-      { title: 'Implement core logic', description: 'Write the main functionality step by step, testing as you go.', estimatedMinutes: 90, order: 3 },
-      { title: 'Handle edge cases', description: 'Test with edge cases and add error handling where needed.', estimatedMinutes: 30, order: 4 },
-      { title: 'Write tests and documentation', description: 'Add comments, write tests, and document your code.', estimatedMinutes: 30, order: 5 },
-      { title: 'Final testing and submission', description: 'Run all tests, clean up code, and prepare for submission.', estimatedMinutes: 20, order: 6 },
+      { title: 'Parse constraints & I/O', description: 'Identify exact inputs, required outputs, and edge cases mentioned in the prompt.', estimatedMinutes: 15, order: 0 },
+      { title: 'Architecture & pseudocode', description: 'Sketch out object structure, database schemas, or primary algorithms before typing.', estimatedMinutes: 20, order: 1 },
+      { title: 'Environment setup', description: 'Initialize the project, install dependencies, and configure the boilerplate.', estimatedMinutes: 10, order: 2 },
+      { title: 'Implement core features', description: 'Build the primary "happy path" functionality.', estimatedMinutes: 60, order: 3 },
+      { title: 'Debugging & edge cases', description: 'Test against weird inputs and fix crashes or logical bugs.', estimatedMinutes: 30, order: 4 },
+      { title: 'Documentation & cleanup', description: 'Add comments, format code, and write a README if required.', estimatedMinutes: 15, order: 5 },
     ],
     reading_response: [
-      { title: 'Read the assigned text', description: 'Read carefully, highlighting key passages and noting your reactions.', estimatedMinutes: 45, order: 0 },
-      { title: 'Identify main themes', description: 'Note the core arguments, themes, or ideas presented in the text.', estimatedMinutes: 15, order: 1 },
-      { title: 'Draft your response', description: 'Write your analysis, connecting the text to course themes and your own perspective.', estimatedMinutes: 40, order: 2 },
-      { title: 'Revise and submit', description: 'Edit for clarity, check word count requirements, and submit.', estimatedMinutes: 15, order: 3 },
+      { title: 'Active reading', description: 'Skim first, then read deeply while highlighting key themes related to class.', estimatedMinutes: 30, order: 0 },
+      { title: 'Theme identification', description: 'Pick 1-2 specific passages or arguments to focus your response on.', estimatedMinutes: 10, order: 1 },
+      { title: 'Drafting response', description: 'Connect the text to broader course concepts and synthesize your opinion.', estimatedMinutes: 25, order: 2 },
+      { title: 'Review & word-count check', description: 'Ensure you meet the minimum length and directly answer the prompt.', estimatedMinutes: 10, order: 3 },
     ],
     presentation: [
-      { title: 'Define the presentation scope', description: 'Clarify the topic, audience, time limit, and key messages.', estimatedMinutes: 15, order: 0 },
-      { title: 'Research content', description: 'Gather information, data, and examples to support your presentation.', estimatedMinutes: 45, order: 1 },
-      { title: 'Create slide outline', description: 'Plan the flow: intro, main points, examples, conclusion.', estimatedMinutes: 20, order: 2 },
-      { title: 'Design slides', description: 'Create clean, visual slides with minimal text and strong visuals.', estimatedMinutes: 60, order: 3 },
-      { title: 'Prepare speaking notes', description: 'Write key talking points for each slide.', estimatedMinutes: 20, order: 4 },
-      { title: 'Practice and rehearse', description: 'Run through the presentation at least twice, timing yourself.', estimatedMinutes: 30, order: 5 },
+      { title: 'Scope & audience check', description: 'Identify the time limit constraints and what the audience needs to takeaway.', estimatedMinutes: 10, order: 0 },
+      { title: 'Research & scripting', description: 'Gather the raw facts and map out the spoken narrative.', estimatedMinutes: 30, order: 1 },
+      { title: 'Visual design & drafting', description: 'Build clean slides with minimal text and high-impact visuals.', estimatedMinutes: 40, order: 2 },
+      { title: 'Add speaker notes', description: 'Transfer detailed points from the screen into your private speaker notes.', estimatedMinutes: 15, order: 3 },
+      { title: 'Timed rehearsal', description: 'Run through verbally with a stopwatch to ensure you fit the window.', estimatedMinutes: 15, order: 4 },
     ],
     project: [
-      { title: 'Define project scope', description: 'Clarify deliverables, constraints, and success criteria.', estimatedMinutes: 20, order: 0 },
-      { title: 'Create a project plan', description: 'Break the project into phases with milestones and deadlines.', estimatedMinutes: 30, order: 1 },
-      { title: 'Research and gather resources', description: 'Collect all materials, tools, and information needed.', estimatedMinutes: 45, order: 2 },
-      { title: 'Execute phase 1', description: 'Complete the first major section or deliverable of the project.', estimatedMinutes: 90, order: 3 },
-      { title: 'Execute phase 2', description: 'Complete the second major section, building on phase 1.', estimatedMinutes: 90, order: 4 },
-      { title: 'Review and polish', description: 'Quality check all deliverables and make final improvements.', estimatedMinutes: 40, order: 5 },
-      { title: 'Final submission', description: 'Compile everything and submit according to instructions.', estimatedMinutes: 20, order: 6 },
+      { title: 'Requirements breakdown', description: 'Map out all mandatory deliverables and final turn-in formats.', estimatedMinutes: 15, order: 0 },
+      { title: 'Milestone planning', description: 'Divide the large project into 2-3 manageable checkpoints.', estimatedMinutes: 15, order: 1 },
+      { title: 'Resource gathering', description: 'Collect references, templates, or external tools required.', estimatedMinutes: 20, order: 2 },
+      { title: 'Core execution phase', description: 'Heads-down work on the primary deliverable.', estimatedMinutes: 90, order: 3 },
+      { title: 'Peer review / self-audit', description: 'Compare current progress against the original rubric.', estimatedMinutes: 20, order: 4 },
+      { title: 'Final compilation', description: 'Assemble all parts, double check formatting, and package for submission.', estimatedMinutes: 15, order: 5 },
     ],
     other: [
-      { title: 'Read and understand requirements', description: 'Carefully review all assignment instructions and note key requirements.', estimatedMinutes: 20, order: 0 },
-      { title: 'Plan your approach', description: 'Decide how to tackle the assignment and break it into steps.', estimatedMinutes: 15, order: 1 },
-      { title: 'Work on main content', description: 'Complete the core work of the assignment.', estimatedMinutes: 60, order: 2 },
-      { title: 'Review and refine', description: 'Check your work against the requirements and make improvements.', estimatedMinutes: 30, order: 3 },
-      { title: 'Finalize and submit', description: 'Do a final check and submit your work.', estimatedMinutes: 15, order: 4 },
+      { title: 'Prompt deconstruction', description: 'Highlight verbs and mandatory constraints in the instructions.', estimatedMinutes: 10, order: 0 },
+      { title: 'Initial drafting/execution', description: 'Complete the bulk of the required tasks without aiming for perfection.', estimatedMinutes: 45, order: 1 },
+      { title: 'Constraint review', description: 'Compare your draft against the original rules to ensure compliance.', estimatedMinutes: 15, order: 2 },
+      { title: 'Final polish & submission', description: 'Clean up styling, grammar, and turn in the assignment.', estimatedMinutes: 10, order: 3 },
     ],
   };
 

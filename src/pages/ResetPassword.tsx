@@ -14,11 +14,16 @@ export default function ResetPassword() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check for recovery token in URL hash
-    const hash = window.location.hash;
-    if (!hash.includes('type=recovery')) {
-      navigate('/login');
-    }
+    // Supabase-js automatically processes the recovery hash and logs the user in.
+    // If the user isn't authenticated after a brief delay, they shouldn't be here.
+    const timer = setTimeout(() => {
+      supabase.auth.getSession().then(({ data }) => {
+        if (!data.session) {
+          navigate('/login');
+        }
+      });
+    }, 1000);
+    return () => clearTimeout(timer);
   }, [navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
