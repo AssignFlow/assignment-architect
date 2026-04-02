@@ -6,8 +6,9 @@ import AppLayout from '@/components/AppLayout';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { PlusCircle, Clock, AlertTriangle, FileText, ArrowRight, Loader2 } from 'lucide-react';
-import { format, formatDistanceToNow, isPast, isToday, isTomorrow, addDays } from 'date-fns';
+import { format, isPast, isToday, isTomorrow } from 'date-fns';
 import type { Tables } from '@/integrations/supabase/types';
+import Countdown from '@/components/Countdown';
 
 type Assignment = Tables<'assignments'>;
 type Task = Tables<'assignment_tasks'>;
@@ -164,9 +165,7 @@ export default function Dashboard() {
                         <Link key={a.id} to={`/assignment/${a.id}`} className="block">
                           <div className="p-3 rounded-lg hover:bg-secondary/30 transition-colors">
                             <h3 className="text-sm font-medium text-foreground">{a.title}</h3>
-                            <p className={`text-xs mt-1 ${isUrgent ? 'text-destructive font-medium' : 'text-muted-foreground'}`}>
-                              {formatDistanceToNow(due, { addSuffix: true })}
-                            </p>
+                            <Countdown targetDate={due} className={`text-xs mt-1 block ${isUrgent ? 'text-destructive font-medium' : 'text-muted-foreground'}`} />
                           </div>
                         </Link>
                       );

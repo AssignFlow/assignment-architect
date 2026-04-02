@@ -4,7 +4,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { FileText, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
+import Logo from '@/components/Logo';
 import { toast } from 'sonner';
 
 export default function Login() {
@@ -31,7 +32,7 @@ export default function Login() {
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <div className="w-full max-w-sm animate-fade-in">
         <Link to="/" className="flex items-center justify-center gap-2 mb-8">
-          <FileText className="h-6 w-6 text-primary" />
+          <Logo className="h-8 w-8" />
           <span className="text-xl font-semibold text-foreground">AssignFlow</span>
         </Link>
 
@@ -42,7 +43,7 @@ export default function Login() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" placeholder="you@school.edu" value={email} onChange={(e) => setEmail(e.target.value)} required className="mt-1.5" />
+              <Input id="email" type="email" placeholder="you@gmail.com" value={email} onChange={(e) => setEmail(e.target.value)} required className="mt-1.5" />
             </div>
             <div>
               <div className="flex items-center justify-between">

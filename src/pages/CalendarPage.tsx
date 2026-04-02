@@ -3,9 +3,10 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import AppLayout from '@/components/AppLayout';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, Calendar, Clock } from 'lucide-react';
-import { format, startOfWeek, addDays, isSameDay } from 'date-fns';
+import { Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { format, startOfWeek, addDays, isSameDay, addWeeks } from 'date-fns';
 import { Link } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
 import type { Tables } from '@/integrations/supabase/types';
 import { cn } from '@/lib/utils';
 
@@ -16,6 +17,8 @@ export default function CalendarPage() {
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const [weekOffset, setWeekOffset] = useState(0);
+
   useEffect(() => {
     if (!user) return;
     supabase.from('assignments').select('*').eq('user_id', user.id).not('due_date', 'is', null).order('due_date')
@@ -23,7 +26,8 @@ export default function CalendarPage() {
   }, [user]);
 
   const today = new Date();
-  const weekStart = startOfWeek(today, { weekStartsOn: 1 });
+  const viewDate = addWeeks(today, weekOffset);
+  const weekStart = startOfWeek(viewDate, { weekStartsOn: 1 });
   const weekDays = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
 
   if (loading) {
@@ -39,8 +43,23 @@ export default function CalendarPage() {
   return (
     <AppLayout>
       <div className="animate-fade-in">
-        <h1 className="text-2xl font-bold text-foreground mb-1">Calendar</h1>
-        <p className="text-sm text-muted-foreground mb-6">Your week at a glance.</p>
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">Calendar</h1>
+            <p className="text-sm text-muted-foreground mt-1">Your week at a glance.</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="icon" onClick={() => setWeekOffset(prev => prev - 1)}>
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <Button variant="outline" onClick={() => setWeekOffset(0)} disabled={weekOffset === 0}>
+              Today
+            </Button>
+            <Button variant="outline" size="icon" onClick={() => setWeekOffset(prev => prev + 1)}>
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
 
         {/* Week view */}
         <div className="grid grid-cols-7 gap-2 mb-8">

@@ -7,10 +7,12 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Loader2, Clock, ArrowLeft, Trash2, RotateCcw, Plus, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { Loader2, Clock, ArrowLeft, Trash2, RotateCcw, Plus, AlertTriangle, CheckCircle2, GripVertical } from 'lucide-react';
+import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 import { toast } from 'sonner';
-import { format, formatDistanceToNow } from 'date-fns';
+import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
+import Countdown from '@/components/Countdown';
 import type { Tables } from '@/integrations/supabase/types';
 import {
   AlertDialog,
@@ -81,6 +83,36 @@ export default function AssignmentDetail() {
       setTasks(prev => [...prev, data]);
       setNewTaskTitle('');
       toast.success('Task added');
+    }
+  };
+
+  const onDragEnd = async (result: DropResult) => {
+    if (!result.destination) return;
+    
+    const { source, destination } = result;
+    if (source.index === destination.index) return;
+    
+    // Optmimistic update
+    const reorderedTasks = Array.from(tasks);
+    const [movedTask] = reorderedTasks.splice(source.index, 1);
+    reorderedTasks.splice(destination.index, 0, movedTask);
+    
+    // Update order locally
+    const updatedTasks = reorderedTasks.map((t, i) => ({ ...t, display_order: i }));
+    setTasks(updatedTasks);
+    
+    // Save to DB in background
+    try {
+      await Promise.all(
+        updatedTasks.map(t => 
+          supabase
+            .from('assignment_tasks')
+            .update({ display_order: t.display_order })
+            .eq('id', t.id)
+        )
+      );
+    } catch {
+      toast.error('Failed to save task order.');
     }
   };
 
@@ -178,10 +210,10 @@ export default function AssignmentDetail() {
           <div className="rounded-lg border border-border bg-card p-4">
             <p className="text-xs text-muted-foreground">Due</p>
             <p className="text-sm font-medium text-foreground mt-1">
-              {assignment.due_date ? format(new Date(assignment.due_date), 'MMM d, yyyy') : 'No date set'}
+              {assignment.due_date ? format(new Date(assignment.due_date), 'MMM d, yyyy h:mm a') : 'No date set'}
             </p>
             {assignment.due_date && (
-              <p className="text-xs text-muted-foreground mt-0.5">{formatDistanceToNow(new Date(assignment.due_date), { addSuffix: true })}</p>
+              <Countdown targetDate={assignment.due_date} className="text-xs text-muted-foreground mt-0.5" />
             )}
           </div>
           <div className="rounded-lg border border-border bg-card p-4">
@@ -214,33 +246,56 @@ export default function AssignmentDetail() {
         {/* Tasks */}
         <div className="rounded-xl border border-border bg-card p-6 mb-6">
           <h2 className="text-base font-semibold text-foreground mb-4">Tasks ({completed}/{total})</h2>
-          <div className="space-y-2">
-            {tasks.map(task => (
-              <div key={task.id} className={cn(
-                'flex items-start gap-3 p-3 rounded-lg transition-colors',
-                task.status === 'completed' ? 'bg-muted/50' : 'hover:bg-secondary/30'
-              )}>
-                <Checkbox
-                  checked={task.status === 'completed'}
-                  onCheckedChange={() => toggleTask(task)}
-                  className="mt-0.5"
-                />
-                <div className="flex-1 min-w-0">
-                  <p className={cn('text-sm', task.status === 'completed' ? 'line-through text-muted-foreground' : 'text-foreground')}>
-                    {task.title}
-                  </p>
-                  {task.description && (
-                    <p className="text-xs text-muted-foreground mt-0.5">{task.description}</p>
-                  )}
+          <DragDropContext onDragEnd={onDragEnd}>
+            <Droppable droppableId="tasks-list">
+              {(provided) => (
+                <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-2">
+                  {tasks.map((task, index) => (
+                    <Draggable key={task.id} draggableId={task.id!} index={index}>
+                      {(provided, snapshot) => (
+                        <div
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          className={cn(
+                            'flex items-start gap-3 p-3 rounded-lg border transition-colors bg-card',
+                            task.status === 'completed' ? 'bg-muted/50 border-transparent' : 'border-border hover:bg-secondary/30',
+                            snapshot.isDragging && 'shadow-md border-primary/50 relative z-10'
+                          )}
+                          style={provided.draggableProps.style}
+                        >
+                          <div
+                            {...provided.dragHandleProps}
+                            className="mt-0.5 text-muted-foreground hover:text-foreground cursor-grab active:cursor-grabbing"
+                          >
+                            <GripVertical className="h-4 w-4" />
+                          </div>
+                          <Checkbox
+                            checked={task.status === 'completed'}
+                            onCheckedChange={() => toggleTask(task)}
+                            className="mt-0.5"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <p className={cn('text-sm', task.status === 'completed' ? 'line-through text-muted-foreground' : 'text-foreground')}>
+                              {task.title}
+                            </p>
+                            {task.description && (
+                              <p className="text-xs text-muted-foreground mt-0.5">{task.description}</p>
+                            )}
+                          </div>
+                          {task.estimated_minutes && (
+                            <span className="text-xs text-muted-foreground whitespace-nowrap flex items-center gap-1">
+                              <Clock className="h-3 w-3" /> {task.estimated_minutes}m
+                            </span>
+                          )}
+                        </div>
+                      )}
+                    </Draggable>
+                  ))}
+                  {provided.placeholder}
                 </div>
-                {task.estimated_minutes && (
-                  <span className="text-xs text-muted-foreground whitespace-nowrap flex items-center gap-1">
-                    <Clock className="h-3 w-3" /> {task.estimated_minutes}m
-                  </span>
-                )}
-              </div>
-            ))}
-          </div>
+              )}
+            </Droppable>
+          </DragDropContext>
 
           {/* Add task */}
           <div className="flex items-center gap-2 mt-4 pt-4 border-t border-border">

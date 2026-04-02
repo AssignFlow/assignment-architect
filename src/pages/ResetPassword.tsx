@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { FileText, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import Logo from '@/components/Logo';
 
 export default function ResetPassword() {
   const [password, setPassword] = useState('');
@@ -41,7 +42,7 @@ export default function ResetPassword() {
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <div className="w-full max-w-sm animate-fade-in">
         <div className="flex items-center justify-center gap-2 mb-8">
-          <FileText className="h-6 w-6 text-primary" />
+          <Logo className="h-8 w-8" />
           <span className="text-xl font-semibold text-foreground">AssignFlow</span>
         </div>
 

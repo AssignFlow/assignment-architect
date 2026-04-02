@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { FileText, ArrowRight, ArrowLeft, GraduationCap, BookOpen, Brain, ListChecks } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import Logo from '@/components/Logo';
 
 const studentTypes = [
   { value: 'high_school', label: 'High School' },
@@ -87,7 +88,7 @@ export default function Onboarding() {
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <div className="w-full max-w-md animate-fade-in">
         <div className="flex items-center justify-center gap-2 mb-8">
-          <FileText className="h-6 w-6 text-primary" />
+          <Logo className="h-8 w-8" />
           <span className="text-xl font-semibold text-foreground">AssignFlow</span>
         </div>
 

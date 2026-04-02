@@ -17,6 +17,8 @@ import Parser from "./pages/Parser";
 import AssignmentDetail from "./pages/AssignmentDetail";
 import HistoryPage from "./pages/HistoryPage";
 import CalendarPage from "./pages/CalendarPage";
+import ClassesPage from "./pages/ClassesPage";
+import ClassDetailPage from "./pages/ClassDetailPage";
 import SettingsPage from "./pages/SettingsPage";
 import NotFound from "./pages/NotFound";
 
@@ -42,6 +44,8 @@ const App = () => (
               <Route path="/assignment/:id" element={<ProtectedRoute><AssignmentDetail /></ProtectedRoute>} />
               <Route path="/history" element={<ProtectedRoute><HistoryPage /></ProtectedRoute>} />
               <Route path="/calendar" element={<ProtectedRoute><CalendarPage /></ProtectedRoute>} />
+              <Route path="/classes" element={<ProtectedRoute><ClassesPage /></ProtectedRoute>} />
+              <Route path="/classes/:id" element={<ProtectedRoute><ClassDetailPage /></ProtectedRoute>} />
               <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
               <Route path="*" element={<NotFound />} />
             </Routes>

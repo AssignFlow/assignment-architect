@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { FileText, Loader2, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
+import Logo from '@/components/Logo';
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState('');
@@ -30,7 +31,7 @@ export default function ForgotPassword() {
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <div className="w-full max-w-sm animate-fade-in">
         <Link to="/" className="flex items-center justify-center gap-2 mb-8">
-          <FileText className="h-6 w-6 text-primary" />
+          <Logo className="h-8 w-8" />
           <span className="text-xl font-semibold text-foreground">AssignFlow</span>
         </Link>
 
@@ -52,7 +53,7 @@ export default function ForgotPassword() {
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                   <Label htmlFor="email">Email</Label>
-                  <Input id="email" type="email" placeholder="you@school.edu" value={email} onChange={(e) => setEmail(e.target.value)} required className="mt-1.5" />
+                  <Input id="email" type="email" placeholder="you@gmail.com" value={email} onChange={(e) => setEmail(e.target.value)} required className="mt-1.5" />
                 </div>
                 <Button type="submit" className="w-full" disabled={loading}>
                   {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Send reset link'}

@@ -3,6 +3,7 @@ import { ArrowRight, CheckCircle2, FileText, Sparkles, Clock, BarChart3, Chevron
 import { Button } from '@/components/ui/button';
 import ThemeToggle from '@/components/ThemeToggle';
 import { useState } from 'react';
+import Logo from '@/components/Logo';
 
 const steps = [
   { icon: FileText, title: 'Paste your assignment', desc: 'Copy and paste the instructions, rubric, or syllabus section exactly as given.' },
@@ -33,7 +34,7 @@ export default function Landing() {
       <nav className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-sm">
         <div className="max-w-6xl mx-auto flex items-center justify-between px-4 h-14">
           <Link to="/" className="flex items-center gap-2">
-            <FileText className="h-5 w-5 text-primary" />
+            <Logo className="h-6 w-6" />
             <span className="font-semibold text-foreground">AssignFlow</span>
           </Link>
           <div className="flex items-center gap-3">
@@ -179,7 +180,7 @@ export default function Landing() {
       <footer className="border-t border-border py-8 px-4">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <FileText className="h-4 w-4 text-primary" />
+            <Logo className="h-5 w-5" />
             <span className="text-sm font-medium text-foreground">AssignFlow</span>
           </div>
           <p className="text-xs text-muted-foreground">© {new Date().getFullYear()} AssignFlow. Built for students who want clarity.</p>

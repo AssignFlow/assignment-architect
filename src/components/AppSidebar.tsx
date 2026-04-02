@@ -1,5 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, PlusCircle, History, Calendar, Settings, FileText, LogOut } from 'lucide-react';
+import { LayoutDashboard, PlusCircle, History, Calendar, Settings, LogOut, BookOpen } from 'lucide-react';
+import Logo from '@/components/Logo';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
 
@@ -8,6 +9,7 @@ const navItems = [
   { href: '/parse', label: 'New Assignment', icon: PlusCircle },
   { href: '/history', label: 'History', icon: History },
   { href: '/calendar', label: 'Calendar', icon: Calendar },
+  { href: '/classes', label: 'My Classes', icon: BookOpen },
   { href: '/settings', label: 'Settings', icon: Settings },
 ];
 
@@ -16,9 +18,9 @@ export default function AppSidebar() {
   const { signOut } = useAuth();
 
   return (
-    <aside className="hidden lg:flex flex-col w-60 border-r border-border bg-card min-h-screen p-4">
+    <aside className="hidden lg:flex flex-col w-60 border-r border-border bg-card h-screen sticky top-0 p-4">
       <Link to="/dashboard" className="flex items-center gap-2 px-2 mb-8">
-        <FileText className="h-6 w-6 text-primary" />
+        <Logo className="h-8 w-8" />
         <span className="text-lg font-semibold text-foreground">AssignFlow</span>
       </Link>
 

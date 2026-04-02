@@ -4,11 +4,13 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { FileText, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
+import Logo from '@/components/Logo';
 import { toast } from 'sonner';
 
 export default function Signup() {
   const [fullName, setFullName] = useState('');
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -17,13 +19,13 @@ export default function Signup() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email.trim() || !password || !fullName.trim()) return;
+    if (!email.trim() || !password || !fullName.trim() || !username.trim()) return;
     if (password.length < 6) {
       toast.error('Password must be at least 6 characters');
       return;
     }
     setLoading(true);
-    const { error } = await signUp(email, password, fullName);
+    const { error } = await signUp(email, password, fullName, username);
     setLoading(false);
     if (error) {
       toast.error(error.message);
@@ -37,7 +39,7 @@ export default function Signup() {
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <div className="w-full max-w-sm animate-fade-in">
         <Link to="/" className="flex items-center justify-center gap-2 mb-8">
-          <FileText className="h-6 w-6 text-primary" />
+          <Logo className="h-8 w-8" />
           <span className="text-xl font-semibold text-foreground">AssignFlow</span>
         </Link>
 
@@ -51,8 +53,12 @@ export default function Signup() {
               <Input id="name" placeholder="Alex Johnson" value={fullName} onChange={(e) => setFullName(e.target.value)} required className="mt-1.5" />
             </div>
             <div>
+              <Label htmlFor="username">Username</Label>
+              <Input id="username" placeholder="alexj" value={username} onChange={(e) => setUsername(e.target.value)} required className="mt-1.5" />
+            </div>
+            <div>
               <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" placeholder="you@school.edu" value={email} onChange={(e) => setEmail(e.target.value)} required className="mt-1.5" />
+              <Input id="email" type="email" placeholder="you@gmail.com" value={email} onChange={(e) => setEmail(e.target.value)} required className="mt-1.5" />
             </div>
             <div>
               <Label htmlFor="password">Password</Label>

@@ -1,10 +1,19 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, FileText, PlusCircle } from 'lucide-react';
+import { Menu, PlusCircle } from 'lucide-react';
+import Logo from '@/components/Logo';
 import { Button } from '@/components/ui/button';
 import ThemeToggle from '@/components/ThemeToggle';
 import { useAuth } from '@/contexts/AuthContext';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { LayoutDashboard, History, Calendar, Settings, LogOut } from 'lucide-react';
+import { LayoutDashboard, History, Calendar, Settings, LogOut, ChevronDown, User as UserIcon, BookOpen } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
 
@@ -13,6 +22,7 @@ const navItems = [
   { href: '/parse', label: 'New Assignment', icon: PlusCircle },
   { href: '/history', label: 'History', icon: History },
   { href: '/calendar', label: 'Calendar', icon: Calendar },
+  { href: '/classes', label: 'My Classes', icon: BookOpen },
   { href: '/settings', label: 'Settings', icon: Settings },
 ];
 
@@ -32,7 +42,7 @@ export default function AppHeader() {
           </SheetTrigger>
           <SheetContent side="left" className="w-64 p-4">
             <Link to="/dashboard" className="flex items-center gap-2 px-2 mb-6" onClick={() => setOpen(false)}>
-              <FileText className="h-6 w-6 text-primary" />
+              <Logo className="h-8 w-8" />
               <span className="text-lg font-semibold text-foreground">AssignFlow</span>
             </Link>
             <nav className="space-y-1">
@@ -69,9 +79,35 @@ export default function AppHeader() {
       <div className="flex items-center gap-2">
         <ThemeToggle />
         {user && (
-          <div className="hidden sm:flex items-center gap-2 text-sm text-muted-foreground">
-            {user.email}
-          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="hidden sm:flex items-center gap-2 text-sm font-medium text-foreground h-9 px-3">
+                <UserIcon className="h-4 w-4 text-muted-foreground mr-1" />
+                {user.user_metadata?.username || user.user_metadata?.full_name?.split(' ')[0].toLowerCase() || user.email?.split('@')[0]}
+                <ChevronDown className="h-3 w-3 text-muted-foreground ml-1" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56 mt-2">
+              <DropdownMenuLabel>
+                <div className="flex flex-col space-y-1">
+                  <p className="text-sm font-medium leading-none">{user.user_metadata?.full_name || 'User'}</p>
+                  <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
+                </div>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem asChild>
+                <Link to="/settings" className="cursor-pointer flex items-center w-full">
+                  <Settings className="mr-2 h-4 w-4" />
+                  <span>Profile & Settings</span>
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => signOut()} className="cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive">
+                <LogOut className="mr-2 h-4 w-4" />
+                <span>Log out</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         )}
       </div>
     </header>

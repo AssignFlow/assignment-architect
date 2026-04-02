@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import AppLayout from '@/components/AppLayout';
@@ -8,8 +8,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { Sparkles, Loader2, Clock, AlertTriangle, CheckCircle2, ListChecks, FileText, ArrowRight } from 'lucide-react';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Sparkles, Loader2, Clock, AlertTriangle, CheckCircle2, ListChecks, FileText, Calendar as CalendarIcon } from 'lucide-react';
 import { toast } from 'sonner';
+import { format } from 'date-fns';
 import { parseAssignmentText, sampleAssignments, type ParsedRequirements, type ParsedWarning } from '@/lib/parser';
 import { cn } from '@/lib/utils';
 
@@ -26,13 +30,31 @@ interface ParseResult {
 export default function Parser() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [rawText, setRawText] = useState('');
   const [title, setTitle] = useState('');
-  const [courseName, setCourseName] = useState('');
-  const [dueDate, setDueDate] = useState('');
+  const prefillCourse = location.state?.prefillCourse;
+  const [courseName, setCourseName] = useState(prefillCourse || '');
+  const [showCustomCourse, setShowCustomCourse] = useState(false);
+  const classes = (user?.user_metadata?.classes as { id: string, name: string }[]) || [];
+  
+  const [dueDate, setDueDate] = useState<Date>();
+  const [dueTime, setDueTime] = useState('23:59');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<ParseResult | null>(null);
   const [saving, setSaving] = useState(false);
+
+  const getCombinedDate = () => {
+    if (!dueDate) return null;
+    const d = new Date(dueDate);
+    if (dueTime) {
+      const [h, m] = dueTime.split(':').map(Number);
+      d.setHours(h, m, 0, 0);
+    } else {
+      d.setHours(23, 59, 59, 999);
+    }
+    return d;
+  };
 
   const handleParse = () => {
     if (!rawText.trim()) {
@@ -42,7 +64,7 @@ export default function Parser() {
     setLoading(true);
     // Simulate parsing delay
     setTimeout(() => {
-      const parsed = parseAssignmentText(rawText, title || 'Untitled Assignment', courseName, dueDate || null);
+      const parsed = parseAssignmentText(rawText, title || 'Untitled Assignment', courseName, dueDate ? format(dueDate, 'yyyy-MM-dd') : null);
       setResult(parsed);
       setLoading(false);
       if (!title) setTitle('Untitled Assignment');
@@ -59,7 +81,7 @@ export default function Parser() {
         course_name: courseName || null,
         raw_input_text: rawText,
         assignment_type: result.assignmentType as any,
-        due_date: dueDate ? new Date(dueDate).toISOString() : null,
+        due_date: getCombinedDate()?.toISOString() || null,
         effort_estimate: result.effortEstimate,
         difficulty_estimate: result.difficultyEstimate,
         priority_level: result.priorityLevel as any,
@@ -93,9 +115,20 @@ export default function Parser() {
 
   const loadSample = (sample: typeof sampleAssignments[0]) => {
     setTitle(sample.title);
+    
+    // Check if sample course exists in user classes
+    const exists = classes.some(c => c.name === sample.course);
+    if (!exists && sample.course) setShowCustomCourse(true);
+    
     setCourseName(sample.course);
     setRawText(sample.text);
-    setDueDate(sample.dueDate);
+    const loadedDate = sample.dueDate ? new Date(sample.dueDate) : undefined;
+    setDueDate(loadedDate);
+    if (loadedDate && loadedDate.getHours() !== 0) {
+      setDueTime(format(loadedDate, 'HH:mm'));
+    } else {
+      setDueTime('23:59');
+    }
     setResult(null);
   };
 
@@ -122,14 +155,91 @@ export default function Parser() {
                 <Input id="title" placeholder="e.g. History Essay #3" value={title} onChange={e => setTitle(e.target.value)} className="mt-1.5" />
               </div>
               <div>
-                <Label htmlFor="course">Course name (optional)</Label>
-                <Input id="course" placeholder="e.g. US History 101" value={courseName} onChange={e => setCourseName(e.target.value)} className="mt-1.5" />
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="course">Class (optional)</Label>
+                  <div className="flex gap-3">
+                    <button 
+                      type="button" 
+                      onClick={() => navigate('/classes')} 
+                      className="text-xs text-primary hover:underline font-medium"
+                    >
+                      Manage Classes
+                    </button>
+                    {classes.length > 0 && (
+                      <button 
+                        type="button" 
+                        onClick={() => setShowCustomCourse(!showCustomCourse)} 
+                        className="text-xs text-muted-foreground hover:underline"
+                      >
+                        {showCustomCourse ? 'Choose from list' : 'Type manually'}
+                      </button>
+                    )}
+                  </div>
+                </div>
+                
+                {showCustomCourse || classes.length === 0 ? (
+                  <Input 
+                    id="course" 
+                    placeholder="e.g. Biology 101" 
+                    value={courseName} 
+                    onChange={e => setCourseName(e.target.value)} 
+                    className="mt-1.5 font-medium" 
+                  />
+                ) : (
+                  <Select value={courseName} onValueChange={setCourseName}>
+                    <SelectTrigger className="mt-1.5 font-medium">
+                      <SelectValue placeholder="Assign to a class..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {classes.map(c => (
+                        <SelectItem key={c.id} value={c.name}>{c.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
               </div>
             </div>
 
-            <div>
-              <Label htmlFor="due">Due date (optional)</Label>
-              <Input id="due" type="date" value={dueDate} onChange={e => setDueDate(e.target.value)} className="mt-1.5 w-auto" />
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex flex-col">
+                <Label htmlFor="due" className="mb-1.5">Due date (optional)</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      id="due"
+                      variant="outline"
+                      className={cn(
+                        'w-[240px] justify-start text-left font-normal',
+                        !dueDate && 'text-muted-foreground'
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {dueDate ? format(dueDate, 'PPP') : <span>Pick a date</span>}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={dueDate}
+                      onSelect={setDueDate}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+
+              {dueDate && (
+                <div className="flex flex-col animate-fade-in">
+                  <Label htmlFor="time" className="mb-1.5">Time</Label>
+                  <Input 
+                    id="time" 
+                    type="time" 
+                    value={dueTime} 
+                    onChange={e => setDueTime(e.target.value)}
+                    className="w-[120px]" 
+                  />
+                </div>
+              )}
             </div>
 
             <div>
