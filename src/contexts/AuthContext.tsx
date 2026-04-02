@@ -44,7 +44,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       password,
       options: {
         data: { full_name: fullName, username },
-        emailRedirectTo: 'https://assignflow.app',
+        emailRedirectTo: 'https://assignflow.app/login',
       },
     });
     return { error: error as Error | null };
