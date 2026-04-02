@@ -14,7 +14,192 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      assignment_tasks: {
+        Row: {
+          assignment_id: string
+          created_at: string
+          description: string | null
+          display_order: number
+          estimated_minutes: number | null
+          id: string
+          status: Database["public"]["Enums"]["task_status"]
+          suggested_due_date: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          assignment_id: string
+          created_at?: string
+          description?: string | null
+          display_order?: number
+          estimated_minutes?: number | null
+          id?: string
+          status?: Database["public"]["Enums"]["task_status"]
+          suggested_due_date?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          assignment_id?: string
+          created_at?: string
+          description?: string | null
+          display_order?: number
+          estimated_minutes?: number | null
+          id?: string
+          status?: Database["public"]["Enums"]["task_status"]
+          suggested_due_date?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assignment_tasks_assignment_id_fkey"
+            columns: ["assignment_id"]
+            isOneToOne: false
+            referencedRelation: "assignments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      assignments: {
+        Row: {
+          assignment_type: Database["public"]["Enums"]["assignment_type"] | null
+          course_name: string | null
+          created_at: string
+          difficulty_estimate: string | null
+          due_date: string | null
+          effort_estimate: string | null
+          id: string
+          parsed_requirements: Json | null
+          parsed_warnings: Json | null
+          priority_level: Database["public"]["Enums"]["priority_level"] | null
+          raw_input_text: string
+          status: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          assignment_type?:
+            | Database["public"]["Enums"]["assignment_type"]
+            | null
+          course_name?: string | null
+          created_at?: string
+          difficulty_estimate?: string | null
+          due_date?: string | null
+          effort_estimate?: string | null
+          id?: string
+          parsed_requirements?: Json | null
+          parsed_warnings?: Json | null
+          priority_level?: Database["public"]["Enums"]["priority_level"] | null
+          raw_input_text: string
+          status?: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          assignment_type?:
+            | Database["public"]["Enums"]["assignment_type"]
+            | null
+          course_name?: string | null
+          created_at?: string
+          difficulty_estimate?: string | null
+          due_date?: string | null
+          effort_estimate?: string | null
+          id?: string
+          parsed_requirements?: Json | null
+          parsed_warnings?: Json | null
+          priority_level?: Database["public"]["Enums"]["priority_level"] | null
+          raw_input_text?: string
+          status?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+          school: string | null
+          student_type: Database["public"]["Enums"]["student_type"] | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          school?: string | null
+          student_type?: Database["public"]["Enums"]["student_type"] | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          school?: string | null
+          student_type?: Database["public"]["Enums"]["student_type"] | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_preferences: {
+        Row: {
+          biggest_struggle: string | null
+          break_length: number
+          created_at: string
+          default_session_length: number
+          help_topics: string[] | null
+          id: string
+          onboarding_completed: boolean
+          planning_style: Database["public"]["Enums"]["planning_style"] | null
+          theme: string
+          updated_at: string
+          user_id: string
+          week_start: string
+        }
+        Insert: {
+          biggest_struggle?: string | null
+          break_length?: number
+          created_at?: string
+          default_session_length?: number
+          help_topics?: string[] | null
+          id?: string
+          onboarding_completed?: boolean
+          planning_style?: Database["public"]["Enums"]["planning_style"] | null
+          theme?: string
+          updated_at?: string
+          user_id: string
+          week_start?: string
+        }
+        Update: {
+          biggest_struggle?: string | null
+          break_length?: number
+          created_at?: string
+          default_session_length?: number
+          help_topics?: string[] | null
+          id?: string
+          onboarding_completed?: boolean
+          planning_style?: Database["public"]["Enums"]["planning_style"] | null
+          theme?: string
+          updated_at?: string
+          user_id?: string
+          week_start?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +208,18 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      assignment_type:
+        | "essay"
+        | "lab_report"
+        | "programming"
+        | "reading_response"
+        | "presentation"
+        | "project"
+        | "other"
+      planning_style: "simple_checklist" | "daily_schedule" | "detailed_plan"
+      priority_level: "low" | "medium" | "high" | "urgent"
+      student_type: "high_school" | "college" | "grad" | "other"
+      task_status: "not_started" | "in_progress" | "completed"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +346,20 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      assignment_type: [
+        "essay",
+        "lab_report",
+        "programming",
+        "reading_response",
+        "presentation",
+        "project",
+        "other",
+      ],
+      planning_style: ["simple_checklist", "daily_schedule", "detailed_plan"],
+      priority_level: ["low", "medium", "high", "urgent"],
+      student_type: ["high_school", "college", "grad", "other"],
+      task_status: ["not_started", "in_progress", "completed"],
+    },
   },
 } as const
