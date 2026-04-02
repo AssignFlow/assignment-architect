@@ -36,12 +36,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signUp = async (email: string, password: string, fullName: string, username: string) => {
+    // Ensure any existing session is cleared to prevent bugs where the user stays logged into a previous account
+    await supabase.auth.signOut();
+    
     const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         data: { full_name: fullName, username },
-        emailRedirectTo: 'https://assignflow.app/login',
+        emailRedirectTo: 'https://assignflow.app',
       },
     });
     return { error: error as Error | null };
